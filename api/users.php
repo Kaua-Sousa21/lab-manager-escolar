@@ -1,0 +1,5 @@
+<?php
+require_once __DIR__ . '/../includes/session.php';
+use Controllers\AuthController;use Controllers\UserController;
+header('Content-Type: application/json; charset=utf-8');AuthController::requireRole('admin');$action=$_REQUEST['action']??'';if($_SERVER['REQUEST_METHOD']==='POST')requireCsrfForPost(true);
+try{switch($action){case'index':jsonResponse(['success'=>true,'data'=>UserController::index()]);case'show':$u=UserController::show((int)($_GET['id']??0));if($u){unset($u['password']);jsonResponse(['success'=>true,'data'=>$u]);}jsonResponse(['success'=>false,'message'=>'Usuário não encontrado.'],404);case'create':$r=UserController::store($_POST);jsonResponse($r,$r['success']?201:400);case'update':$r=UserController::update((int)($_POST['id']??0),$_POST);jsonResponse($r,$r['success']?200:400);case'delete':$r=UserController::destroy((int)($_POST['id']??0));jsonResponse($r,$r['success']?200:400);default:jsonResponse(['success'=>false,'message'=>'Ação inválida.'],400);}}catch(Throwable $e){error_log($e->getMessage());jsonResponse(['success'=>false,'message'=>'Erro interno ao processar a solicitação.'],500);}

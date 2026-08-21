@@ -1,0 +1,5 @@
+<?php
+require_once __DIR__ . '/../includes/session.php';
+use Controllers\AuthController;use Controllers\StudentController;
+header('Content-Type: application/json; charset=utf-8');AuthController::requireRole('admin','coordinator');$action=$_REQUEST['action']??'';if($_SERVER['REQUEST_METHOD']==='POST')requireCsrfForPost(true);
+try{switch($action){case'index':jsonResponse(['success'=>true,'data'=>StudentController::index()]);case'show':$s=StudentController::show((int)($_GET['id']??0));$s?jsonResponse(['success'=>true,'data'=>$s]):jsonResponse(['success'=>false,'message'=>'Aluno não encontrado.'],404);case'create':$r=StudentController::store($_POST);jsonResponse($r,$r['success']?201:400);case'update':$r=StudentController::update((int)($_POST['id']??0),$_POST);jsonResponse($r,$r['success']?200:400);case'delete':$r=StudentController::destroy((int)($_POST['id']??0));jsonResponse($r,$r['success']?200:400);default:jsonResponse(['success'=>false,'message'=>'Ação inválida.'],400);}}catch(Throwable $e){error_log($e->getMessage());jsonResponse(['success'=>false,'message'=>'Erro interno ao processar a solicitação.'],500);}
